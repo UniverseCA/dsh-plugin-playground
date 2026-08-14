@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  syntax-check:
+    name: Syntax check (host.js / client.js)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Run node --check on plugin sources
+        run: |
+          set -e
+          for f in opencode-go-usage-plugin/host.js opencode-go-usage-plugin/client.js; do
+            echo "checking $f"
+            node --check "$f"
+          done
+        shell: bash
+      - name: Confirm no accidental credentials are committed
+        run: |
+          set -e
+          if git grep -nE -e 'sk-live' -e 'sk-ant' -e 'BEGIN (RSA|OPENSSH|EC) PRIVATE' -- . ':(exclude).gitignore' ':(exclude)LICENSE' >/dev/null 2>&1; then
+            echo "::error::Looks like a secret was committed"; exit 1
+          fi
+          echo "no-secrets-ok"
+        shell: bash

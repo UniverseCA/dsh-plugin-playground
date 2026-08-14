@@ -2,9 +2,14 @@
 
 A **Dynamic Cordis Plugin** for [DeepSeek Harness (DSH)](https://github.com/Crascit) web GUI that shows your **OpenCode Go subscription usage** as a compact badge in the **conversation header (top-right status area)**, with a click-to-open detail card.
 
-![status](https://img.shields.io/badge/dsh-plugin-dynamic-8a2be2) ![platform](https://img.shields.io/badge/platform-browser-brightgreen)
+![Platform: browser](https://img.shields.io/badge/platform-browser-brightgreen)
+![License: MIT](https://img.shields.io/github/license/UniverseCA/opencode-go-usage-badge)
+![Stars](https://img.shields.io/github/stars/UniverseCA/opencode-go-usage-badge?style=social)
+![Last commit](https://img.shields.io/github/last-commit/UniverseCA/opencode-go-usage-badge)
 
 ![Screenshot placeholder — add `docs/screenshot.png`](docs/screenshot.png)
+
+> 徽标效果见 `docs/screenshot.md`：顶部右上角的 `Go X%` 徽标 + 点击展开的 Rolling/Weekly/Monthly 详情卡。放一张真实截图到 `docs/screenshot.png` 后这里会自动显示。
 
 ## Features
 
