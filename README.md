@@ -79,17 +79,18 @@ DSH dynamic Cordis plugins run in **two halves**:
 |---|---|
 | `opencode-go-usage-plugin/host.js` | Host half — credential + fetch logic |
 | `opencode-go-usage-plugin/client.js` | Client half — badge + detail-card UI |
+| `opencode-go-usage-plugin/INSTALL.md` | Step-by-step install / build guide (中英) |
 | `opencode-go-usage-plugin/README.md` | Implementation notes (中文) |
 
 ## Installing / Running
 
-The plugin is loaded through DSH's **dynamic Cordis plugin** mechanism, not an npm package:
+This is a **dynamic Cordis plugin**, not an npm package — you load `host.js`
+and `client.js` through DSH's dynamic-plugin mechanism. Follow the full guide
+in **[`opencode-go-usage-plugin/INSTALL.md`](opencode-go-usage-plugin/INSTALL.md)**.
 
-1. Make sure your DSH credential `OPENCODE_GO_API_KEY` is configured (DSH reads `~/.dsh/.credentials.yaml`), or set it as an environment variable.
-2. In a DSH session, define the plugin with `cordis_define` using the bodies of `host.js` and `client.js` as `code.host` / `code.client`, then activate with `cordis_run`.
-3. **The badge appears only in the host page that owns the plugin** — refresh / switch into a session and look at the **top-right** of the conversation header.
-
-> A clickable one-command installer (e.g. `dsh install <plugin>`) will be added here once available.
+Quick summary: make sure `OPENCODE_GO_API_KEY` is configured → `cordis_define`
+with `code.host`/`code.client` from those files → `cordis_run` → authorize →
+refresh & open a session → the badge appears top-right of the header.
 
 ## Configuration
 
