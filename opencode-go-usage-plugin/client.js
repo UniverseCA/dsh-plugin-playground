@@ -42,28 +42,33 @@ function UsageBadge(props) {
     return '#3ecf8e'
   }
 
-  // 把 resetsAt（ISO 时间戳或空）格式化成用户可读的“重置于 …”。
+  // 把 resetsAt（UTC ISO 时间戳）格式化成用户可读的“距离重置还有多久 + 具体重置时刻”。
+  // resetsAt 经 new Date(iso) 会自动转成本地时区，倒计时/时刻均按本地基准显示。
   function formatReset(resetsAt) {
     if (!resetsAt) return null
     var d = new Date(resetsAt)
     if (isNaN(d.getTime())) return null
-    var now = Date.now()
-    var diffMs = d.getTime() - now
-    var diffMin = Math.round(diffMs / 60000)
+    var now = new Date()
+    var diffMs = d.getTime() - now.getTime()
+    if (diffMs < 0) return '已重置（' + fmtWall(d) + '）'
+    var diffMin = Math.floor(diffMs / 60000)
+    var diffH = Math.floor(diffMs / 3600000)
+    var diffD = Math.floor(diffMs / 86400000)
+
+    var remain = ''
+    if (diffH < 1) remain = '' + Math.max(diffMin, 1) + ' 分钟后'
+    else if (diffD < 1) remain = '' + diffH + ' 小时后'
+    else remain = '' + diffD + ' 天后'
+
+    return remain + '重置（' + fmtWall(d) + '）'
+  }
+  // 本地化墙钟时间：MM-DD HH:MM
+  function fmtWall(d) {
+    var mo = String(d.getMonth() + 1).padStart(2, '0')
+    var da = String(d.getDate()).padStart(2, '0')
     var hh = String(d.getHours()).padStart(2, '0')
     var mm = String(d.getMinutes()).padStart(2, '0')
-    var dayLbl = ''
-    if (d.toDateString() !== new Date(now).toDateString()) {
-      dayLbl = '明天 ' // 跨天简化标注
-    }
-    if (diffMin >= 0 && diffMin < 60) {
-      return '重置于 ' + hh + ':' + mm + '（' + (diffMin <= 0 ? 0 : diffMin) + ' 分钟后）'
-    }
-    var dh = Math.floor(diffMs / 3600000)
-    if (dh >= 24) {
-      return dayLbl + hh + ':' + mm + ' 重置'
-    }
-    return '重置于 ' + hh + ':' + mm + '（' + dh + ' 小时后）'
+    return mo + '-' + da + ' ' + hh + ':' + mm
   }
 
   function Row(rowProps) {
