@@ -38,6 +38,12 @@ Host 端通过 DSH 的 `credentials.resolve('OPENCODE_GO_API_KEY')` 解析。
 - `host.js` → `code.host`（取数：解析凭据 → curl 调 usage API → `harness.handle('fetch-usage')`）
 - `client.js` → `code.client`（注册 `conversation.session.header.utilities`，渲染徽标+详情卡，60s 定时刷新）
 
+## 实现要点（踩过的坑）
+
+- **Host 取数**：用 `ctx.get('credentials')` 调 `credentials.resolve('OPENCODE_GO_API_KEY')` 取回 key（DSH 凭据服务的正确用法），再用 `ctx.get('subprocess')` 跑 `curl -x http://127.0.0.1:7897` 带 Bearer 调 usage API。
+- **Client timer**：定时器不能用全局 `setTimeout`，也不能直接 `ctx.interval`（未声明依赖会被 Guard 拦截、导致渲染 cell abdicate）。必须用 `ctx.get('timer').interval(...)` 这种**可选服务访问**（`ctx.get` + 空检查），既不触发 Guard 也优雅回退。
+- **注入范围**：动态插件的 Client half 只注入到**发起该插件的宿主 DSH 页面会话**，用独立浏览器标签（Playwright 等）连同一 URL 不会复现，验证需在真实宿主页面进行。
+
 ## 部署
 
 在 DSH 会话中用动态 Cordis 插件机制（`cordis_define` / `cordis_run`）加载：
