@@ -1,6 +1,6 @@
 // OpenCode Go 用量徽标 — Client 半边（完整版）
 // 注册到会话标题栏右侧 conversation.session.header.utilities：
-// 显示彩色用量徽标（rolling 5h 百分比），点击弹出详情卡（Rolling/Weekly/Monthly 用量百分比），
+// 显示彩色用量徽标（rolling 5h 百分比），点击弹出详情卡（Rolling/Weekly/Monthly 用量百分比 + 各自的重置时间），
 // 每 60s 通过 host.call('fetch-usage') 刷新。
 //
 // 目标：在 cordis_define 中作为 code.client 传入（body），返回一个 Cordis 插件。
@@ -42,12 +42,41 @@ function UsageBadge(props) {
     return '#3ecf8e'
   }
 
+  // 把 resetsAt（ISO 时间戳或空）格式化成用户可读的“重置于 …”。
+  function formatReset(resetsAt) {
+    if (!resetsAt) return null
+    var d = new Date(resetsAt)
+    if (isNaN(d.getTime())) return null
+    var now = Date.now()
+    var diffMs = d.getTime() - now
+    var diffMin = Math.round(diffMs / 60000)
+    var hh = String(d.getHours()).padStart(2, '0')
+    var mm = String(d.getMinutes()).padStart(2, '0')
+    var dayLbl = ''
+    if (d.toDateString() !== new Date(now).toDateString()) {
+      dayLbl = '明天 ' // 跨天简化标注
+    }
+    if (diffMin >= 0 && diffMin < 60) {
+      return '重置于 ' + hh + ':' + mm + '（' + (diffMin <= 0 ? 0 : diffMin) + ' 分钟后）'
+    }
+    var dh = Math.floor(diffMs / 3600000)
+    if (dh >= 24) {
+      return dayLbl + hh + ':' + mm + ' 重置'
+    }
+    return '重置于 ' + hh + ':' + mm + '（' + dh + ' 小时后）'
+  }
+
   function Row(rowProps) {
     const ru = rowProps.ru
-    return React.createElement('div', { style: { display: 'flex', justifyContent: 'space-between', padding: '5px 0', borderBottom: '1px solid #24262e' } },
-      React.createElement('span', { style: { color: '#9aa0aa' } }, rowProps.label),
-      React.createElement('span', { style: { fontWeight: 700, color: labelColor(ru.percent) } },
-        typeof ru.percent === 'number' ? (ru.percent + '%') : '—'))
+    const reset = ru ? formatReset(ru.resetsAt) : null
+    return React.createElement('div', { style: { padding: '6px 0', borderBottom: '1px solid #24262e' } },
+      React.createElement('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' } },
+        React.createElement('span', { style: { color: '#9aa0aa' } }, rowProps.label),
+        React.createElement('span', { style: { fontWeight: 700, color: labelColor(ru.percent) } },
+          typeof ru.percent === 'number' ? (ru.percent + '%') : '—')),
+      reset
+        ? React.createElement('div', { style: { fontSize: 11, color: '#6b7280', marginTop: 2 } }, reset)
+        : null)
   }
 
   const card = React.createElement('div', { style: {
