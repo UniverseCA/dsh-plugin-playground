@@ -4,8 +4,11 @@
 // 每 60s 通过 host.call('fetch-usage') 刷新。
 //
 // 目标：在 cordis_define 中作为 code.client 传入（body），返回一个 Cordis 插件。
+// 注意：CSS 定时器需通过 Cordis timer 服务（inject: ['timer']），不假设全局 setTimeout。
 
 function UsageBadge(props) {
+  // interval(fn, ms) 由 apply 闭包传入（Cordis timer 服务），null 表示不可用。
+  const intervalFn = props.interval
   const [state, setState] = React.useState(null)
   const [open, setOpen] = React.useState(false)
 
@@ -22,9 +25,9 @@ function UsageBadge(props) {
       })
     }
     load()
-    if (typeof ctx.interval === 'function') unsub = ctx.interval(load, 60000)
+    if (typeof intervalFn === 'function') unsub = intervalFn(load, 60000)
     return function () { alive = false; if (unsub) { try { unsub() } catch (e) {} } }
-  }, [])
+  }, [intervalFn])
 
   const meta = state && state.ok && state.data && state.data.usage ? state.data.usage : null
   const rolling = meta ? meta.rolling : null
@@ -75,13 +78,22 @@ function UsageBadge(props) {
 }
 
 return {
+  inject: ['timer'],
   apply(ctx) {
     const slots = ctx.get('slots')
     if (slots === undefined) return
+    // ctx.interval 在声明 inject:['timer'] 后可用（Cordis timer mixin）。
+    const intervalClosure = function (fn, ms) {
+      if (typeof ctx.interval === 'function') return ctx.interval(fn, ms)
+      return null
+    }
+    const Slotted = function () {
+      return React.createElement(UsageBadge, { interval: intervalClosure })
+    }
     slots.inject('conversation.session.header.utilities', function () {
       return slots.register(
         { name: 'conversation.session.header.utilities', id: 'opencode-go-usage' },
-        function () { return React.createElement(UsageBadge, null) })
+        Slotted)
     })
   }
 }
