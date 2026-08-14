@@ -1,14 +1,13 @@
-// OpenCode Go 用量徽标 — Client 半边
+// OpenCode Go 用量徽标 — Client 半边（完整版）
 // 注册到会话标题栏右侧 conversation.session.header.utilities：
-// 显示一个彩色用量徽标（rolling 5h 百分比），点击弹出详情卡（Rolling/Weekly/Monthly），
+// 显示彩色用量徽标（rolling 5h 百分比），点击弹出详情卡（Rolling/Weekly/Monthly 用量百分比），
 // 每 60s 通过 host.call('fetch-usage') 刷新。
 //
 // 目标：在 cordis_define 中作为 code.client 传入（body），返回一个 Cordis 插件。
-// 注意：CSS 定时器需通过 Cordis timer 服务（inject: ['timer']），不假设全局 setTimeout。
+// 说明：动态插件 Client half 只注入到宿主该 Plugin 的 DSH 页面会话（非任意新标签页）。
 
 function UsageBadge(props) {
-  // interval(fn, ms) 由 apply 闭包传入（Cordis timer 服务），null 表示不可用。
-  const intervalFn = props.interval
+  const intervalFn = (props && props.interval) || null
   const [state, setState] = React.useState(null)
   const [open, setOpen] = React.useState(false)
 
@@ -68,32 +67,29 @@ function UsageBadge(props) {
 
   const badge = React.createElement('button', {
     onClick: function (ev) { ev.preventDefault(); ev.stopPropagation(); setOpen(!open) },
-    style: { display: 'flex', alignItems: 'center', gap: 7, height: 28, padding: '0 11px', borderRadius: 999, cursor: 'pointer', border: '1px solid #2a2e38', background: 'rgba(23,25,30,0.9)', color: '#dde1e8', fontFamily: 'inherit', fontSize: 12, fontWeight: 600, whiteSpace: 'nowrap' },
-    title: 'OpenCode Go 用量 · 点击开关详情'
+    title: 'OpenCode Go 用量 · 点击开关详情',
+    style: { display: 'inline-flex', alignItems: 'center', gap: 6, height: 26, padding: '0 10px', borderRadius: 999, cursor: 'pointer', border: '1px solid #333', background: '#1a1d24', color: '#eee', fontSize: 12, fontWeight: 600 }
   },
-    React.createElement('span', { style: { width: 8, height: 8, borderRadius: 8, background: tone, boxShadow: '0 0 8px ' + tone, display: 'inline-block' } }),
+    React.createElement('span', { style: { width: 8, height: 8, borderRadius: 8, background: tone, display: 'inline-block' } }),
     React.createElement('span', null, 'Go ' + (pct === null ? '…' : pct + '%')))
 
   return React.createElement('div', { style: { position: 'relative', display: 'inline-flex' } }, badge, open ? card : null)
 }
 
 return {
-  inject: ['timer'],
   apply(ctx) {
     const slots = ctx.get('slots')
     if (slots === undefined) return
-    // ctx.interval 在声明 inject:['timer'] 后可用（Cordis timer mixin）。
+    // timer 是可选服务，用 ctx.get('timer') 读取；不存在时优雅回退为仅首次拉取。
+    const timerSvc = ctx.get('timer')
     const intervalClosure = function (fn, ms) {
-      if (typeof ctx.interval === 'function') return ctx.interval(fn, ms)
+      if (timerSvc && typeof timerSvc.interval === 'function') return timerSvc.interval(fn, ms)
       return null
-    }
-    const Slotted = function () {
-      return React.createElement(UsageBadge, { interval: intervalClosure })
     }
     slots.inject('conversation.session.header.utilities', function () {
       return slots.register(
-        { name: 'conversation.session.header.utilities', id: 'opencode-go-usage' },
-        Slotted)
+        { name: 'conversation.session.header.utilities', id: 'opencode-go-usage', label: 'OpenCode Go' },
+        function () { return React.createElement(UsageBadge, { interval: intervalClosure }) })
     })
   }
 }
