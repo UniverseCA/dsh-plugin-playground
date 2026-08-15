@@ -27,7 +27,8 @@ jobs:
             copy-format-plugin/client.js \
             prompt-templates-plugin/client.js \
             session-rename-plugin/client.js \
-            message-favorites-plugin/client.js; do
+            message-favorites-plugin/client.js \
+            latency-chart-plugin/client.js; do
             echo "checking $f"
             node --check "$f"
           done
