@@ -35,6 +35,12 @@ function addFav(f) { _favorites = [_favorites.filter(function (x) { return x.id 
 function removeFav(id) { _favorites = _favorites.filter(function (f) { return f.id !== id }); persist(); notify() }
 function subscribe(fn) { _listeners.push(fn); return function () { var i = _listeners.indexOf(fn); if (i >= 0) _listeners.splice(i, 1) } }
 
+// 面板开合状态（共享 store；trigger 与 panel 都订阅，取代 CustomEvent 协调）
+var _open = false
+function isOpen() { return _open }
+function setOpenPanel(v) { _open = v; notify() }
+function togglePanel() { _open = !_open; notify() }
+
 // 从会话快照按 messageId 取文本（assistant 节点的 text 块）
 function textForMessage(snap, messageId) {
   if (!snap || !messageId) return ''
@@ -98,18 +104,19 @@ function FavStar(props) {
 
 // ---- 收藏面板触发按钮（sidebar.footer.action，root）----
 function FavTrigger(props) {
-  var wide = props.wide
-  var onToggle = props.onToggle
   var [count, setCount] = React.useState(_favorites.length)
+  var [open, setOpenLocal] = React.useState(isOpen())
   React.useEffect(function () {
-    var unsub = subscribe(function () { setCount(_favorites.length) })
+    var unsub = subscribe(function () { setCount(_favorites.length); setOpenLocal(isOpen()) })
     return unsub
   }, [])
 
   return React.createElement('button', {
-    type: 'button', title: '打开收藏面板',
+    type: 'button', title: open ? '关闭收藏面板' : '打开收藏面板',
     'aria-label': '收藏面板',
-    onClick: function () { if (onToggle) onToggle() },
+    'aria-pressed': open,
+    dataActive: open || undefined,
+    onClick: function () { togglePanel() },
     style: {
       display: 'inline-flex', alignItems: 'center', gap: 5, height: 26, padding: '0 8px',
       borderRadius: 999, cursor: 'pointer', border: 'none',
@@ -122,24 +129,13 @@ function FavTrigger(props) {
 // ---- 收藏面板（shell.overlay，root）----
 function FavPanel(props) {
   var [favs, setFavs] = React.useState(_favorites)
-  var [open, setOpen] = React.useState(false)
+  var [open, setOpenLocal] = React.useState(isOpen())
   var [query, setQuery] = React.useState('')
   var [copied, setCopied] = React.useState(null)
 
   React.useEffect(function () {
-    var unsub = subscribe(function () { setFavs(_favorites) })
+    var unsub = subscribe(function () { setFavs(_favorites); setOpenLocal(isOpen()) })
     return unsub
-  }, [])
-
-  // shell.overlay 是 root 叠层且无 owner 传开关；用模块级 CustomEvent 协调：
-  // trigger 派发 dsh:fav-toggle，面板监听以切换 open。
-  React.useEffect(function () {
-    function onCustom(e) {
-      var state = e && e.detail
-      setOpen(function (prev) { return typeof state === 'boolean' ? state : !prev })
-    }
-    window.addEventListener('dsh:fav-toggle', onCustom)
-    return function () { window.removeEventListener('dsh:fav-toggle', onCustom) }
   }, [])
 
   if (!open) return null
@@ -171,7 +167,7 @@ function FavPanel(props) {
   },
     React.createElement('div', { style: { display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:8 } },
       React.createElement('span', { style:{ fontWeight:700, fontSize:13 } }, '⭐ 收藏 ' + favs.length),
-      React.createElement('button', { style:{ background:'none', border:'none', color:'var(--dsw-alias-label-tertiary,#8a90a0)', cursor:'pointer', fontSize:13 }, onClick:function(){ setOpen(false) } }, '✕')),
+      React.createElement('button', { style:{ background:'none', border:'none', color:'var(--dsw-alias-label-tertiary,#8a90a0)', cursor:'pointer', fontSize:13 }, onClick:function(){ setOpenPanel(false) } }, '✕')),
     React.createElement('input', { type:'text', placeholder:'搜索收藏…', value: query, autoFocus:true, onChange:function(e){ setQuery(e.target.value) }, style:{ width:'100%', boxSizing:'border-box', background:'var(--dsw-alias-bg-primary,#14161b)', border:'1px solid var(--dsw-alias-border-secondary,#2b2f3a)', color:'inherit', borderRadius:8, padding:'6px 10px', fontSize:13, marginBottom:8 } }),
     shown.length === 0
       ? React.createElement('div', { style:{ color:'var(--dsw-alias-label-tertiary,#8a90a0)', padding:'8px 2px' } }, q ? '无匹配收藏' : '还没有收藏 —— 在任意 AI 回复旁点 ⭐ 收藏。')
@@ -200,17 +196,11 @@ return {
         function (props) { return React.createElement(FavStar, props) })
     })
 
-    // 2) 侧栏触发按钮（root）—— 派发 dsh:fav-toggle 告知面板切换
+    // 2) 侧栏触发按钮（root）—— togglePanel 经共享 store 通知面板
     slots.inject('sidebar.footer.action', function () {
       return slots.register(
         { name: 'sidebar.footer.action', id: 'message-favorites-trigger', order: 50, label: '收藏' },
-        function (props) {
-          return React.createElement(FavTrigger, Object.assign({}, props, {
-            onToggle: function (next) {
-              window.dispatchEvent(new CustomEvent('dsh:fav-toggle', { detail: next }))
-            }
-          }))
-        })
+        function (props) { return React.createElement(FavTrigger, props) })
     })
 
     // 3) 收藏面板（root 叠层）

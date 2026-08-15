@@ -25,8 +25,8 @@
 | 收藏按钮 | `sidebar.footer.action` | root | 派发 `dsh:fav-toggle` 事件 |
 | 收藏面板 | `shell.overlay` | root | 监听 `dsh:fav-toggle` 切换开关 |
 
-- 收藏数据在模块级共享 store（内存 + `localStorage`，key `dsh.favorites.v1`），并带订阅，
-  让星标/角标/面板同步刷新。
+- 收藏数据与面板开合都在**模块级共享 store**（内存 + `localStorage`，key `dsh.favorites.v1`），
+  带订阅，让星标 / 角标 / 面板经同一来源同步刷新（触发按钮 toggle，面板订阅开合）。
 - 星标读取文本走与 `copy-format-plugin` 相同的「`useSession` → 按 messageId 定位
   assistant 节点 → 取 `kind:'text'` 块」。
 

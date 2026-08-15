@@ -42,7 +42,8 @@ function LatencyPanel(props) {
           step: n.step,
           text: (n.blocks || []).filter(function (b) { return b && b.kind === 'text' && typeof b.text === 'string' }).map(function (b) { return b.text }).join(''),
           totalMs: typeof t.stepStartTime === 'number' && t.completedTime > t.stepStartTime ? (t.completedTime - t.stepStartTime) : null,
-          ttftMs: typeof t.stepStartTime === 'number' && typeof t.firstTokenTime === 'number' && t.firstTokenTime >= t.stepStartTime ? (t.firstTokenTime - t.stepStartTime) : null
+          ttftMs: typeof t.stepStartTime === 'number' && typeof t.firstTokenTime === 'number' && t.firstTokenTime >= t.stepStartTime ? (t.firstTokenTime - t.stepStartTime) : null,
+          tokens: n.usage && typeof n.usage.outputTokens === 'number' && isFinite(n.usage.outputTokens) && n.usage.outputTokens > 0 ? Math.round(n.usage.outputTokens) : null
         })
       }
     }
