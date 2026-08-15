@@ -25,7 +25,8 @@ jobs:
             opencode-go-usage-plugin/host.js opencode-go-usage-plugin/client.js \
             system-monitor-plugin/host.js system-monitor-plugin/client.js \
             copy-format-plugin/client.js \
-            prompt-templates-plugin/client.js; do
+            prompt-templates-plugin/client.js \
+            session-rename-plugin/client.js; do
             echo "checking $f"
             node --check "$f"
           done

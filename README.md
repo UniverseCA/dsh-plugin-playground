@@ -10,9 +10,11 @@ A set of **Dynamic Cordis Plugins** for [DeepSeek Harness (DSH)](https://github.
 | **System Monitor Badge** | [`system-monitor-plugin/`](system-monitor-plugin/) | 会话头部的宿主 CPU/内存(及 GPU 型号) 实时监控徽标 + 详情卡 |
 | **Copy Format** | [`copy-format-plugin/`](copy-format-plugin/) | 每条 AI 回复图标的 `MD`/`TXT` 复制按钮（复制 Markdown 或纯文本） |
 | **Prompt Templates** | [`prompt-templates-plugin/`](prompt-templates-plugin/) | composer 上方的「模板」按钮 + 常用 prompt 面板，一键写回输入框 |
+| **Session Rename** | [`session-rename-plugin/`](session-rename-plugin/) | 会话头部手动重命名按钮 + 用首条消息快速命名（pin 标题） |
 
-> 说明：`copy-format-plugin` 与 `prompt-templates-plugin` 均为纯客户端半边（无 `host.js`）；
-> 插件是否需要 Host 半边，取决于它能否只用客户端会话快照/标准 kit 就满足需求。
+> 说明：`copy-format-plugin`、`prompt-templates-plugin` 与 `session-rename-plugin` 均为
+> 纯客户端半边（无 `host.js`）；插件是否需要 Host 半边，取决于它能否只用客户端会话
+> 快照/标准 kit/客户端服务就满足需求。
 
 每个插件都是 **host.js（宿主进程采集）+ client.js（页面 UI 注入）** 的双半边结构，
 安装方式见各自目录里的 `INSTALL.md`。
