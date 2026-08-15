@@ -1,4 +1,20 @@
-# OpenCode Go Usage Badge
+# DSH 实用插件集 Playground / OpenCode Go Usage Badge
+
+A set of **Dynamic Cordis Plugins** for [DeepSeek Harness (DSH)](https://github.com/Crascit) web GUI.
+
+## 仓库内的插件
+
+| 插件 | 目录 | 作用 |
+|---|---|---|
+| **OpenCode Go Usage Badge** | [`opencode-go-usage-plugin/`](opencode-go-usage-plugin/) | 会话头部的 OpenCode Go 用量徽标 + Rolling/Weekly/Monthly 详情卡 |
+| **System Monitor Badge** | [`system-monitor-plugin/`](system-monitor-plugin/) | 会话头部的宿主 CPU/内存(及 GPU 型号) 实时监控徽标 + 详情卡 |
+
+每个插件都是 **host.js（宿主进程采集）+ client.js（页面 UI 注入）** 的双半边结构，
+安装方式见各自目录里的 `INSTALL.md`。
+
+---
+
+## OpenCode Go Usage Badge
 
 A **Dynamic Cordis Plugin** for [DeepSeek Harness (DSH)](https://github.com/Crascit) web GUI that shows your **OpenCode Go subscription usage** as a compact badge in the **conversation header (top-right status area)**, with a click-to-open detail card.
 
