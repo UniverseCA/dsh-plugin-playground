@@ -5,7 +5,7 @@
 > 与 `opencode-go-usage-plugin` 同款架构与视觉风格：会话头部右上角的胶囊徽标 + 点击展开的详情卡。
 
 ![platform-browser](https://img.shields.io/badge/platform-browser-brightgreen)
-![license-MIT](https://img.shields.io/github/license/UniverseCA/opencode-go-usage-badge)
+![license-MIT](https://img.shields.io/github/license/UniverseCA/dsh-plugin-playground)
 
 ## 特性
 

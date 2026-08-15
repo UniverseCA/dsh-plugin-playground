@@ -1,4 +1,4 @@
-# DSH 实用插件集 Playground / OpenCode Go Usage Badge
+# DSH Plugin Playground（DSH 动态 Cordis 插件集）
 
 A set of **Dynamic Cordis Plugins** for [DeepSeek Harness (DSH)](https://github.com/Crascit) web GUI.
 
@@ -31,9 +31,9 @@ A set of **Dynamic Cordis Plugins** for [DeepSeek Harness (DSH)](https://github.
 A **Dynamic Cordis Plugin** for [DeepSeek Harness (DSH)](https://github.com/Crascit) web GUI that shows your **OpenCode Go subscription usage** as a compact badge in the **conversation header (top-right status area)**, with a click-to-open detail card.
 
 ![Platform: browser](https://img.shields.io/badge/platform-browser-brightgreen)
-![License: MIT](https://img.shields.io/github/license/UniverseCA/opencode-go-usage-badge)
-![Stars](https://img.shields.io/github/stars/UniverseCA/opencode-go-usage-badge?style=social)
-![Last commit](https://img.shields.io/github/last-commit/UniverseCA/opencode-go-usage-badge)
+![License: MIT](https://img.shields.io/github/license/UniverseCA/dsh-plugin-playground)
+![Stars](https://img.shields.io/github/stars/UniverseCA/dsh-plugin-playground?style=social)
+![Last commit](https://img.shields.io/github/last-commit/UniverseCA/dsh-plugin-playground)
 
 ![Screenshot placeholder — add `docs/screenshot.png`](docs/screenshot.png)
 
