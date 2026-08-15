@@ -11,6 +11,7 @@ A set of **Dynamic Cordis Plugins** for [DeepSeek Harness (DSH)](https://github.
 | **Copy Format** | [`copy-format-plugin/`](copy-format-plugin/) | 每条 AI 回复图标的 `MD`/`TXT` 复制按钮（复制 Markdown 或纯文本） |
 | **Prompt Templates** | [`prompt-templates-plugin/`](prompt-templates-plugin/) | composer 上方的「模板」按钮 + 常用 prompt 面板，一键写回输入框 |
 | **Session Rename** | [`session-rename-plugin/`](session-rename-plugin/) | 会话头部手动重命名按钮 + 用首条消息快速命名（pin 标题） |
+| **Message Favorites** | [`message-favorites-plugin/`](message-favorites-plugin/) | 每条 AI 回复收藏星标 + 可搜索的收藏面板（侧栏触发 + overlay 浮层） |
 
 > 说明：`copy-format-plugin`、`prompt-templates-plugin` 与 `session-rename-plugin` 均为
 > 纯客户端半边（无 `host.js`）；插件是否需要 Host 半边，取决于它能否只用客户端会话

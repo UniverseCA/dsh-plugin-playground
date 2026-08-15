@@ -26,7 +26,8 @@ jobs:
             system-monitor-plugin/host.js system-monitor-plugin/client.js \
             copy-format-plugin/client.js \
             prompt-templates-plugin/client.js \
-            session-rename-plugin/client.js; do
+            session-rename-plugin/client.js \
+            message-favorites-plugin/client.js; do
             echo "checking $f"
             node --check "$f"
           done
