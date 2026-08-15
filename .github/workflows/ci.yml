@@ -23,7 +23,8 @@ jobs:
           set -e
           for f in \
             opencode-go-usage-plugin/host.js opencode-go-usage-plugin/client.js \
-            system-monitor-plugin/host.js system-monitor-plugin/client.js; do
+            system-monitor-plugin/host.js system-monitor-plugin/client.js \
+            copy-format-plugin/client.js; do
             echo "checking $f"
             node --check "$f"
           done
