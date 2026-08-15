@@ -21,6 +21,9 @@ A set of **Dynamic Cordis Plugins** for [DeepSeek Harness (DSH)](https://github.
 每个插件都是 **host.js（宿主进程采集）+ client.js（页面 UI 注入）** 的双半边结构，
 安装方式见各自目录里的 `INSTALL.md`。
 
+> 📌 想了解每个插件的注入点（slot）、scope、技术要点与维护陷阱，见
+> **[`docs/PLUGINS.md`](docs/PLUGINS.md)**（插件总览 + 注入点对照表）。
+
 ---
 
 ## OpenCode Go Usage Badge
