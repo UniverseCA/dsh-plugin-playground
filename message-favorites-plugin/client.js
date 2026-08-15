@@ -69,10 +69,12 @@ function titleFromText(text) {
 // ---- 每消息收藏星标（conversation.chat.assistant-actions）----
 function FavStar(props) {
   var useSession = props.useSession
+  var inputActions = props.inputActions
   var messageId = props.messageId
   var snap = useSession(function (s) { return s })
   var text = textForMessage(snap, messageId)
   var [active, setActive] = React.useState(hasFav(messageId))
+  var [flash, setFlash] = React.useState(null)
 
   React.useEffect(function () {
     var unsub = subscribe(function () { setActive(hasFav(messageId)) })
@@ -85,8 +87,16 @@ function FavStar(props) {
     if (hasFav(messageId)) removeFav(messageId)
     else addFav({ id: messageId, title: titleFromText(text), text: text, ts: Date.now() })
   }
+  // 把收藏正文插入输入框（assistant-actions 是 session 作用域，inputActions 由标准 kit 提供）
+  function insertText(e) {
+    e.preventDefault(); e.stopPropagation()
+    if (!inputActions || typeof inputActions.setDraft !== 'function' || !text) { setFlash('noinput'); return }
+    inputActions.setDraft(text)
+    setFlash('inserted')
+    window.setTimeout(function () { setFlash(null) }, 1500)
+  }
 
-  return React.createElement('button', {
+  var starBtn = React.createElement('button', {
     type: 'button', disabled: !messageId || !text,
     title: active ? '取消收藏' : '收藏该回答',
     'aria-label': active ? '取消收藏' : '收藏该回答',
@@ -100,6 +110,21 @@ function FavStar(props) {
       opacity: active ? 1 : undefined, padding: 0
     }
   }, active ? '★' : '☆')
+
+  return React.createElement('span', { style: { display: 'inline-flex', alignItems: 'center', gap: 0 } },
+    starBtn,
+    active && text ? React.createElement('button', {
+      type: 'button', title: '把该回答插入输入框',
+      'aria-label': '把该回答插入输入框',
+      onClick: insertText,
+      style: {
+        width: 26, height: 28, background: '0 0',
+        border: 'none', borderRadius: 14, justifyContent: 'center', alignItems: 'center', display: 'inline-flex',
+        fontSize: 11, cursor: 'pointer', padding: '0 4px',
+        color: flash === 'inserted' ? '#3ecf8e' : 'var(--dsw-alias-label-tertiary,#9aa0aa)'
+      }
+    }, flash === 'inserted' ? '✓' : '⤓') : null,
+    flash === 'noinput' ? React.createElement('span', { style: { fontSize: 10, color: '#e5484d', marginLeft: 4 } }, '不可插入') : null)
 }
 
 // ---- 收藏面板触发按钮（sidebar.footer.action，root）----

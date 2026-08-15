@@ -11,6 +11,8 @@
 
 - **每消息星标**：在 `conversation.chat.assistant-actions` 注入，点 ⭐ 收藏当前 AI 回复，
   再点取消；已收藏呈实心 ★。
+- **插入输入框**：已收藏的消息旁会出现「⤓」按钮，把该条收藏正文经 `inputActions.setDraft`
+  一键填进输入框（assistant-actions 是 session 作用域，标准 kit 提供 `inputActions`）。
 - **侧栏触发**：`sidebar.footer.action` 加「⭐ 收藏」按钮（带数量角标）。
 - **浮层面板**：`shell.overlay`（root/list，整页浮层）承载收藏列表 + 搜索框。
   - 由于 overlay 默认 click-through，面板元素自身 `pointer-events:auto` 以接收交互。
