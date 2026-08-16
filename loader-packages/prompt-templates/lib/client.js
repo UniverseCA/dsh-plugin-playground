@@ -162,9 +162,9 @@ function smallBtn(primary) {
 
     const slots = ctx.get('slots')
     if (slots === undefined) return
-    slots.inject('conversation.input.dock', function () {
+    slots.inject('conversation.input.left', function () {
       return slots.register(
-        { name: 'conversation.input.dock', id: 'prompt-templates', label: 'Prompt Templates', order: 1000 },
+        { name: 'conversation.input.left', id: 'prompt-templates', label: 'Prompt Templates', order: 1000 },
         function (props) { return React.createElement(PromptTemplates, props) })
     })
   

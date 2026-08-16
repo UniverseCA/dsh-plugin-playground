@@ -236,10 +236,10 @@ function FavPanel(props) {
         function (props) { return React.createElement(FavStar, props) })
     })
 
-    // 2) 侧栏触发按钮（root）—— togglePanel 经共享 store 通知面板
-    slots.inject('sidebar.footer.action', function () {
+    // 2) 会话头部触发按钮 —— togglePanel 经共享 store 通知面板
+    slots.inject('conversation.session.header.utilities', function () {
       return slots.register(
-        { name: 'sidebar.footer.action', id: 'message-favorites-trigger', order: 50, label: '收藏' },
+        { name: 'conversation.session.header.utilities', id: 'message-favorites-trigger', order: 30, label: '收藏' },
         function (props) { return React.createElement(FavTrigger, props) })
     })
 
