@@ -1,0 +1,24 @@
+{
+  "name": "dsh-plugin-prompt-templates",
+  "version": "0.1.0",
+  "private": true,
+  "description": "DSH Loader client plugin: composer 上方的常用 prompt 模板面板（Prompt Templates），持久化自动装载。",
+  "license": "MIT",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": {
+      "default": "./lib/index.js"
+    },
+    "./client": {
+      "default": "./lib/client.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "client": {
+      "platform": "web",
+      "inject": []
+    }
+  }
+}

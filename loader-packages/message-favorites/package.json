@@ -1,0 +1,24 @@
+{
+  "name": "dsh-plugin-message-favorites",
+  "version": "0.1.0",
+  "private": true,
+  "description": "DSH Loader client plugin: 收藏 AI 回复 + 可搜索收藏面板（Message Favorites），持久化自动装载。",
+  "license": "MIT",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": {
+      "default": "./lib/index.js"
+    },
+    "./client": {
+      "default": "./lib/client.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "client": {
+      "platform": "web",
+      "inject": []
+    }
+  }
+}

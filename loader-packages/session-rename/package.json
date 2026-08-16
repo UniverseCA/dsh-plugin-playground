@@ -1,0 +1,24 @@
+{
+  "name": "dsh-plugin-session-rename",
+  "version": "0.1.0",
+  "private": true,
+  "description": "DSH Loader client plugin: 会话头部的重命名按钮 + 用首条消息快速命名（Session Rename），持久化自动装载。",
+  "license": "MIT",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": {
+      "default": "./lib/index.js"
+    },
+    "./client": {
+      "default": "./lib/client.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "client": {
+      "platform": "web",
+      "inject": []
+    }
+  }
+}
