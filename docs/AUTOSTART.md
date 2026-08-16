@@ -3,8 +3,8 @@
 本文记录把插件升级为 **DSH Loader 持久插件**（随 DSH 启动自动装载、在「设置 → 插件」
 里可管、不再随会话重启消失）的实施方案、当前进度与回滚方法。
 
-> 状态：**原型验证成功 ✅**（`dsh-plugin-latency-chart` 随 DSH 启动自动装载、boot 图可见、
-> 浏览器 `/plugins/.../client.js` 返回 200、header utilities slot 真实渲染出 ⏱️ 耗时按钮、无报错）。
+> 状态：**5 个纯 client 插件已持久化成功 ✅**（latency-chart / copy-format / prompt-templates /
+> session-rename / message-favorites 均随 DSH 启动自动装载、boot 图可见、浏览器渲染 UI 无报错）。
 
 ---
 
