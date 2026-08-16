@@ -3,8 +3,9 @@
 本文记录把插件升级为 **DSH Loader 持久插件**（随 DSH 启动自动装载、在「设置 → 插件」
 里可管、不再随会话重启消失）的实施方案、当前进度与回滚方法。
 
-> 状态：**5 个纯 client 插件已持久化成功 ✅**（latency-chart / copy-format / prompt-templates /
-> session-rename / message-favorites 均随 DSH 启动自动装载、boot 图可见、浏览器渲染 UI 无报错）。
+> 状态：**全部 7 个插件已持久化成功 ✅**（latency-chart / copy-format / prompt-templates /
+> session-rename / message-favorites / system-monitor / opencode-usage 均随 DSH 启动自动装载、
+> boot 图可见、浏览器渲染 UI 无报错。带 host 的两个用 webServer JSON API 方案——见下方「方案 B」）。
 
 ---
 
@@ -86,14 +87,37 @@ C:\Users\32193\.dsh\profiles\node_modules\dsh-plugin-latency-chart  (Junction)
 
 ---
 
-## 后续：推广其余 6 个
+## 全部完成 ✅（7 个插件）
 
-原型验证成功后，把 `system-monitor / copy-format / prompt-templates /
-session-rename / message-favorites / opencode-go-usage` 逐个按同法构建成
-`loader-packages/<name>/` 包（各自的 client.js / host.js），用同样方式
-junction + 注册进 cordis.patch.yml。
+已把 7 个插件全部转成 `loader-packages/<name>/` 的 Loader 持久包并注册：
 
-- 纯 client 插件：只用 `lib/client.js` + 空 `lib/index.js`。
-- 带 host 的（system-monitor / opencode-go-usage）：还需 node half 实现
-  `apply(ctx)` 用 `subprocess`/`credentials`（即把它们原来的 host.js 转成
-  ESM `export { apply }`）。
+| 持久包 | 目录 | host/client |
+|---|---|---|
+| `dsh-plugin-latency-chart` | `loader-packages/latency-chart` | 纯 client |
+| `dsh-plugin-copy-format` | `loader-packages/copy-format` | 纯 client |
+| `dsh-plugin-prompt-templates` | `loader-packages/prompt-templates` | 纯 client |
+| `dsh-plugin-session-rename` | `loader-packages/session-rename` | 纯 client |
+| `dsh-plugin-message-favorites` | `loader-packages/message-favorites` | 纯 client |
+| `dsh-plugin-system-monitor` | `loader-packages/system-monitor` | **host + client** |
+| `dsh-plugin-opencode-usage` | `loader-packages/opencode-usage` | **host + client** |
+
+## 两个带 host 插件的 RPC 方案（方案 B：webServer JSON API）
+
+带 host 的插件**不能用**动态插件的 `harness.handle`/`host.call`（持久插件里没有那套）。
+改用 **webServer JSON API**：
+
+- **host 半**：`inject: ['webServer']`，在 `apply(ctx)` 里
+  `ctx.get('webServer').register({ kind:'prefix', path:'/__dsh_xxx', handler: async (req,res)=>{...} })`
+  处理器中做取数（subprocess / credentials），`res.end(JSON.stringify(result))`。
+- **client 半**：同源 `fetch('/__dsh_xxx', { method:'GET', cache:'no-store' })` 取 JSON 显示。
+
+已实现：
+- `dsh-plugin-system-monitor` → route `/__dsh_sysmon`（subprocess + powershell 采 CPU/内存/GPU/OS）
+- `dsh-plugin-opencode-usage` → route `/__dsh_opencode_usage`（credentials 取 OPENCODE_GO_API_KEY + curl 走代理调 usage API）
+
+已验证：路由返回真实 JSON，client `fetch` 正常，UI 渲染无报错。
+
+## 转换工具
+
+`loader-packages/convert.mjs` 把纯 client 的 `client.js` 自动转成
+`window.__ModuleLoader__.load({...})` bundle。
