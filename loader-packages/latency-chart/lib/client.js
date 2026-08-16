@@ -126,7 +126,7 @@ window.__ModuleLoader__.load({
       slots.inject("conversation.session.header.utilities", function () {
         return slots.register(
           { name: "conversation.session.header.utilities", id: "request-latency-chart", label: "\u8bf7\u6c42\u8017\u65f6" },
-          function () { return reactModule.createElement(LatencyPanel, null); });
+          function (props) { return reactModule.createElement(LatencyPanel, props); });
       });
     };
 

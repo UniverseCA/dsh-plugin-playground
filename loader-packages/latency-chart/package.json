@@ -4,6 +4,7 @@
   "private": true,
   "description": "DSH Loader client plugin: 请求耗时迷你条形图（Latency Chart），持久化自动装载。",
   "license": "MIT",
+  "type": "module",
   "main": "lib/index.js",
   "exports": {
     ".": {
