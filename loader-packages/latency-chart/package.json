@@ -1,0 +1,23 @@
+{
+  "name": "dsh-plugin-latency-chart",
+  "version": "0.1.0",
+  "private": true,
+  "description": "DSH Loader client plugin: 请求耗时迷你条形图（Latency Chart），持久化自动装载。",
+  "license": "MIT",
+  "main": "lib/index.js",
+  "exports": {
+    ".": {
+      "default": "./lib/index.js"
+    },
+    "./client": {
+      "default": "./lib/client.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "client": {
+      "platform": "web",
+      "inject": []
+    }
+  }
+}
