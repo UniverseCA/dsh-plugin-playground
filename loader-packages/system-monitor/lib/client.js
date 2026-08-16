@@ -23,6 +23,19 @@ window.__ModuleLoader__.load({
       var open = openAll[0];
       var setOpen = openAll[1];
 
+      // 互斥协调：打开时广播；其它浮层收到后关闭自己
+      var PANEL_ID = "system-monitor";
+      useEffect(function () {
+        function onPanelOpen(ev) {
+          try { if (ev && ev.detail && ev.detail.id !== PANEL_ID) setOpen(false); } catch (e) {}
+        }
+        window.addEventListener("dsh:panel-open", onPanelOpen);
+        return function () { window.removeEventListener("dsh:panel-open", onPanelOpen); };
+      }, []);
+      function notifyOpen() {
+        try { window.dispatchEvent(new CustomEvent("dsh:panel-open", { detail: { id: PANEL_ID } })); } catch (e) {}
+      }
+
       var intervalFn = props.interval;
 
       useEffect(function () {
@@ -86,7 +99,7 @@ window.__ModuleLoader__.load({
         : React.createElement("div", { style: { color: "#e5484d", padding: "6px 0" } }, (state && state.error) || "\u52a0\u8f7d\u5931\u8d25"));
 
       var badge = React.createElement("button", {
-        onClick: function (ev) { ev.preventDefault(); ev.stopPropagation(); setOpen(!open); },
+        onClick: function (ev) { ev.preventDefault(); ev.stopPropagation(); if (open) { setOpen(false); } else { setOpen(true); notifyOpen(); } },
         title: "\u7cfb\u7edf\u76d1\u63a7 \u00b7 \u70b9\u51fb\u5f00\u5173\u8be6\u60c5",
         style: { display: "inline-flex", alignItems: "center", gap: 7, height: 26, padding: "0 10px", borderRadius: 999, cursor: "pointer", border: "1px solid #333", background: "#1a1d24", color: "#eee", fontSize: 12, fontWeight: 600 }
       },

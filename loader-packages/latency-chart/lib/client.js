@@ -26,12 +26,26 @@ window.__ModuleLoader__.load({
       var useSession = props.useSession;
       var snap = useSession(function (s) { return s });
       var useState = reactModule.useState;
+      var useEffect = reactModule.useEffect;
       var openState = useState(false);
       var open = openState[0];
       var setOpen = openState[1];
       var modeState = useState("total");
       var mode = modeState[0];
       var setMode = modeState[1];
+
+      // 互斥协调：打开时广播；其它浮层收到后关闭自己
+      var PANEL_ID = "latency-chart";
+      useEffect(function () {
+        function onPanelOpen(ev) {
+          try { if (ev && ev.detail && ev.detail.id !== PANEL_ID) setOpen(false); } catch (e) {}
+        }
+        window.addEventListener("dsh:panel-open", onPanelOpen);
+        return function () { window.removeEventListener("dsh:panel-open", onPanelOpen); };
+      }, []);
+      function notifyOpen() {
+        try { window.dispatchEvent(new CustomEvent("dsh:panel-open", { detail: { id: PANEL_ID } })); } catch (e) {}
+      }
 
       var items = [];
       if (snap) {
@@ -88,7 +102,7 @@ window.__ModuleLoader__.load({
       };
 
       return reactModule.createElement("div", { style: { position: "relative", display: "inline-flex" } },
-        reactModule.createElement("button", { type: "button", style: btn, title: "\u8bf7\u6c42\u8017\u65f6\u56fe\u8868", onClick: function (e) { e.preventDefault(); e.stopPropagation(); setOpen(!open); } }, "\u23f1\ufe0f \u8017\u65f6"),
+        reactModule.createElement("button", { type: "button", style: btn, title: "\u8bf7\u6c42\u8017\u65f6\u56fe\u8868", onClick: function (e) { e.preventDefault(); e.stopPropagation(); if (open) { setOpen(false); } else { setOpen(true); notifyOpen(); } } }, "\u23f1\ufe0f \u8017\u65f6"),
         open ? reactModule.createElement("div", { style: card },
           reactModule.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 } },
             reactModule.createElement("span", { style: { fontWeight: 700, fontSize: 13 } }, "\u8bf7\u6c42\u8017\u65f6"),

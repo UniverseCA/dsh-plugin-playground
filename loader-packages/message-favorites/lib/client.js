@@ -52,9 +52,20 @@ function subscribe(fn) { _listeners.push(fn); return function () { var i = _list
 
 // 面板开合状态（共享 store；trigger 与 panel 都订阅，取代 CustomEvent 协调）
 var _open = false
+var PANEL_ID = 'message-favorites'
 function isOpen() { return _open }
-function setOpenPanel(v) { _open = v; notify() }
-function togglePanel() { _open = !_open; notify() }
+function setOpenPanel(v) {
+  if (v && !_open) {
+    try { window.dispatchEvent(new CustomEvent('dsh:panel-open', { detail: { id: PANEL_ID } })) } catch (e) {}
+  }
+  _open = v; notify()
+}
+function togglePanel() {
+  if (!_open) {
+    try { window.dispatchEvent(new CustomEvent('dsh:panel-open', { detail: { id: PANEL_ID } })) } catch (e) {}
+  }
+  _open = !_open; notify()
+}
 
 // 从会话快照按 messageId 取文本（assistant 节点的 text 块）
 function textForMessage(snap, messageId) {
@@ -175,7 +186,11 @@ function FavPanel(props) {
 
   React.useEffect(function () {
     var unsub = subscribe(function () { setFavs(_favorites); setOpenLocal(isOpen()) })
-    return unsub
+    function onPanelOpen(ev) {
+      try { if (ev && ev.detail && ev.detail.id !== PANEL_ID) setOpenPanel(false) } catch (e) {}
+    }
+    window.addEventListener('dsh:panel-open', onPanelOpen)
+    return function () { unsub(); window.removeEventListener('dsh:panel-open', onPanelOpen) }
   }, [])
 
   if (!open) return null

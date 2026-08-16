@@ -53,6 +53,19 @@ function PromptTemplates(props) {
   if (typeof useInput === 'function') { try { var snap = useInput(function (s) { return s }); draft = (snap && snap.draft) || '' } catch (e) {} }
 
   var [open, setOpen] = React.useState(false)
+  // 互斥协调：打开时广播；其它浮层收到后关闭自己
+  var PANEL_ID = 'prompt-templates'
+  React.useEffect(function () {
+    function onPanelOpen(ev) {
+      try { if (ev && ev.detail && ev.detail.id !== PANEL_ID) setOpen(false) } catch (e) {}
+    }
+    window.addEventListener('dsh:panel-open', onPanelOpen)
+    return function () { window.removeEventListener('dsh:panel-open', onPanelOpen) }
+  }, [])
+  function notifyOpen() {
+    try { window.dispatchEvent(new CustomEvent('dsh:panel-open', { detail: { id: PANEL_ID } })) } catch (e) {}
+  }
+
   var [list, setList] = React.useState(loadTemplates)
   var [query, setQuery] = React.useState('')
   var [adding, setAdding] = React.useState(false)
@@ -110,7 +123,7 @@ function PromptTemplates(props) {
   return React.createElement('div', { style: { display: 'inline-flex', position: 'relative' } },
     React.createElement('button', {
       type: 'button', style: btn, title: '常用 Prompt 模板',
-      onClick: function (e) { e.preventDefault(); e.stopPropagation(); setOpen(!open) }
+      onClick: function (e) { e.preventDefault(); e.stopPropagation(); if (open) { setOpen(false) } else { setOpen(true); notifyOpen() } }
     }, '📋 模板' + (list.length ? ' ' + list.length : '')),
     open ? React.createElement('div', { style: panelStyle },
       React.createElement('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 } },
