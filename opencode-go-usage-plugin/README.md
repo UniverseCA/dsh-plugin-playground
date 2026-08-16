@@ -1,50 +1,109 @@
-# OpenCode Go 用量徽标（DSH 动态 Cordis 插件）
+# OpenCode Go Usage Badge
 
-在 DSH web GUI 的**会话标题栏右侧（页面顶部状态区）**显示 OpenCode Go 套餐用量徽标：
-点击弹出详情卡，展示 **Rolling(5h) / Weekly / Monthly** 三个窗口的用量百分比，并**每 60 秒自动刷新**。
+A **Dynamic Cordis Plugin** for [DeepSeek Harness (DSH)](https://github.com/Crascit) web GUI that shows your **OpenCode Go subscription usage** as a compact badge in the **conversation header (top-right status area)**, with a click-to-open detail card.
 
-## 数据源
+![License: MIT](https://img.shields.io/badge/license-MIT-brightgreen) ![Platform: browser](https://img.shields.io/badge/platform-browser-brightgreen)
 
-OpenCode 官方用量 API：
+---
 
-- **端点**：`GET https://opencode.ai/zen/go/v1/usage`
-- **认证**：`Authorization: Bearer <OPENCODE_GO_API_KEY>`
-- **响应**：
-  ```json
-  {
-    "usage": {
-      "rolling":  { "status": "ok", "percent": 0, "resetsAt": "..." },
-      "weekly":   { "status": "ok", "percent": 0, "resetsAt": "..." },
-      "monthly":  { "status": "ok", "percent": 0, "resetsAt": "..." }
-    }
+## Features
+
+- 🏷️ **Live badge** in the session header showing the **Rolling (5h)** usage percentage, colored by consumption:
+  - 🟢 green < 50%
+  - 🟠 amber ≥ 50%
+  - 🔴 red ≥ 80%
+- 📊 **Detail card** on click showing usage percentage **and reset time** for all three windows:
+  - **Rolling (5h)** · **Weekly** · **Monthly**
+  - e.g. `4 小时后重置（08-15 06:23）` — local-time aware, shows `X 分钟后/小时后/天后重置 (MM-DD HH:MM)`
+- ⏱️ Auto-refreshes every **60 seconds**
+- 🔐 Uses your existing DSH credential (`OPENCODE_GO_API_KEY`) — no CLI install needed
+
+---
+
+## Data Source
+
+Uses the **official OpenCode usage API**:
+
+```
+GET https://opencode.ai/zen/go/v1/usage
+Authorization: Bearer <OPENCODE_GO_API_KEY>
+```
+
+```json
+{
+  "usage": {
+    "rolling": { "status": "ok", "percent": 0, "resetsAt": "..." },
+    "weekly":  { "status": "ok", "percent": 0, "resetsAt": "..." },
+    "monthly": { "status": "ok", "percent": 0, "resetsAt": "..." }
   }
-  ```
-- 语义：rolling = 滚动 5 小时窗口；weekly = 本周（周一 UTC 重置）；monthly = 本月计费周期。均为 account-wide 百分比。
-- 错误：401 = key 被拒；403 EntitlementError = 无 Go 订阅。
+}
+```
 
-参考来源：[robinebers/openusage](https://raw.githubusercontent.com/robinebers/openusage/main/docs/providers/opencode.md)、
-[andywang425/opencode-go-usage-api](https://raw.githubusercontent.com/andywang425/opencode-go-usage-api/master/README.md)、
-[farion1231/cc-switch#6433](https://github.com/farion1231/cc-switch/issues/6433)。
+| Window | Meaning |
+|---|---|
+| `rolling` | Rolling 5-hour window |
+| `weekly` | This week (resets Monday 00:00 UTC) |
+| `monthly` | Current billing month |
 
-## 凭据
+Errors: `401` = key rejected · `403 EntitlementError` = no Go subscription.
 
-本机 DSH 的凭据存储 `~/.dsh/.credentials.yaml` 中的 `OPENCODE_GO_API_KEY`。
-Host 端通过 DSH 的 `credentials.resolve('OPENCODE_GO_API_KEY')` 解析。
+> This window/percent representation comes from the official `/v1/usage` endpoint
+> (discovered via [cc-switch#6433](https://github.com/farion1231/cc-switch/issues/6433),
+> corroborated by [robinebers/openusage](https://raw.githubusercontent.com/robinebers/openusage/main/docs/providers/opencode.md)
+> and [andywang425/opencode-go-usage-api](https://raw.githubusercontent.com/andywang425/opencode-go-usage-api/master/README.md)).
+> The fetch uses a browser `User-Agent` to avoid Cloudflare blocking, and parses
+> multiple field-name variants (`percent`/`usagePercent`/`used`+`limit`) leniently.
 
-本机网络需经本地代理 `http://127.0.0.1:7897` 才能连通源站，插件用 `subprocess` + `curl -x` 调用。
+---
 
-## 代码
+## Architecture
 
-- `host.js` → `code.host`（取数：解析凭据 → curl 调 usage API → `harness.handle('fetch-usage')`）
-- `client.js` → `code.client`（注册 `conversation.session.header.utilities`，渲染徽标+详情卡，60s 定时刷新）
+DSH dynamic Cordis plugins run in **two halves**:
 
-## 实现要点（踩过的坑）
+```
+┌────────────── Host (DSH Node process) ──────────────┐
+│  credentials.resolve('OPENCODE_GO_API_KEY')         │
+│         │                                           │
+│  subprocess.run(curl -x PROXY -H "Bearer <key>"     │
+│                  https://opencode.ai/zen/go/v1/usage)│
+│         │                                           │
+│  harness.handle('fetch-usage')  ← client calls this │
+└─────────────────────────────────────────────────────┘
+                    │  Package-private JSON-RPC
+┌────────────── Client (browser page) ────────────────┐
+│  slots.inject('conversation.session.header.utilities') │
+│  → <Go 0%> badge + detail card                       │
+│  ctx.get('timer').interval(load, 60000)  // refresh  │
+└─────────────────────────────────────────────────────┘
+```
 
-- **Host 取数**：用 `ctx.get('credentials')` 调 `credentials.resolve('OPENCODE_GO_API_KEY')` 取回 key（DSH 凭据服务的正确用法），再用 `ctx.get('subprocess')` 跑 `curl -x http://127.0.0.1:7897` 带 Bearer 调 usage API。
-- **Client timer**：定时器不能用全局 `setTimeout`，也不能直接 `ctx.interval`（未声明依赖会被 Guard 拦截、导致渲染 cell abdicate）。必须用 `ctx.get('timer').interval(...)` 这种**可选服务访问**（`ctx.get` + 空检查），既不触发 Guard 也优雅回退。
-- **注入范围**：动态插件的 Client half 只注入到**发起该插件的宿主 DSH 页面会话**，用独立浏览器标签（Playwright 等）连同一 URL 不会复现，验证需在真实宿主页面进行。
+## File Layout
 
-## 部署
+| File | Role |
+|---|---|
+| `host.js` | Host half — credential + fetch logic (implements `harness.handle('fetch-usage')`) |
+| `client.js` | Client half — badge + detail-card UI (60 s refresh) |
+| `INSTALL.md` | Step-by-step install guide (中文) |
 
-在 DSH 会话中用动态 Cordis 插件机制（`cordis_define` / `cordis_run`）加载：
-两者传入 `code.host` 与 `code.client` 的**函数体**（此处文件为便于维护做了包装注释，实际定义时取文件内容即可）。
+## Installing / Running
+
+Load through DSH's **dynamic Cordis plugin** mechanism (`cordis_define` + `cordis_run`):
+see **[`INSTALL.md`](INSTALL.md)** for the exact steps (中文), or the repo-root
+[`README.md`](../README.md) for the general how-to in both flavors.
+
+## Configuration
+
+- **API key**: provided automatically via DSH `credentials.resolve('OPENCODE_GO_API_KEY')`.
+- **Proxy**: the fetch runs `curl -x http://127.0.0.1:7897` in this build (the source endpoint is behind Cloudflare and needs a browser User-Agent + a reachable route). If your network doesn't need a proxy, remove the `-x` flag in `host.js`.
+- **Refresh interval**: change `60000` (ms) in `client.js`.
+
+## Why not the Zen balance?
+
+OpenCode has **two products** that are easy to confuse:
+
+- **OpenCode Go** (subscription) → official `/v1/usage` returns usage **percentages** per window. This plugin targets **this**.
+- **OpenCode Zen** (pay-as-you-go balance) → has **no official balance JSON endpoint**; it uses the `_server` billing server-function with a login **cookie** (`balance / 1e8` = USD). Not included here.
+
+## License
+
+[MIT](../LICENSE)

@@ -1,5 +1,10 @@
 # Message Favorites + Search（动态 Cordis 插件 · 纯客户端）
 
+> ## 🚀 安装
+> 这是 DSH **动态 Cordis 插件**，安装 = 在支持动态插件的 DSH 会话里用 `cordis_define` / `cordis_run`
+> 加载本目录的 `client.js`（纯客户端，无 host）。通用安装教程见
+> [仓库根 README](../README.md)，本插件的详细步骤见 **[`INSTALL.md`](INSTALL.md)**。
+
 收藏 AI 回复，并提供一个**可搜索的收藏面板**。
 
 - ⭐ 每条已完成的 AI 回复图标行加收藏星标（可收藏 / 取消）。

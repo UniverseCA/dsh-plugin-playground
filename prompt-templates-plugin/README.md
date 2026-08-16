@@ -1,5 +1,10 @@
 # Prompt Template Drawer（动态 Cordis 插件 · 纯客户端）
 
+> ## 🚀 安装
+> 这是 DSH **动态 Cordis 插件**，安装 = 在支持动态插件的 DSH 会话里用 `cordis_define` / `cordis_run`
+> 加载本目录的 `client.js`（纯客户端，无 host）。通用安装教程见
+> [仓库根 README](../README.md)，本插件的详细步骤见 **[`INSTALL.md`](INSTALL.md)**。
+
 在 DSH Web GUI 的 **composer 上方 dock 区**注入一个「📋 模板」按钮：
 
 - 打开一个模板面板，保存并管理你的**常用 prompt**。

@@ -1,5 +1,10 @@
 # System Monitor Badge (动态 Cordis 插件)
 
+> ## 🚀 安装
+> 这是 DSH **动态 Cordis 插件**，安装 = 在支持动态插件的 DSH 会话里用 `cordis_define` / `cordis_run`
+> 加载本目录的 **`host.js`（作为 `code.host`）** 和 **`client.js`（作为 `code.client`）**。
+> 通用安装教程见 [仓库根 README](../README.md)，本插件的详细步骤见 **[`INSTALL.md`](INSTALL.md)**。
+
 **DSH Web GUI** 顶部实时系统监控条：CPU / 内存（宿主机）/ GPU（可选、自动探测）。
 
 > 与 `opencode-go-usage-plugin` 同款架构与视觉风格：会话头部右上角的胶囊徽标 + 点击展开的详情卡。

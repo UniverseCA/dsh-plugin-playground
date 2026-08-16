@@ -1,142 +1,104 @@
-# DSH Plugin Playground（DSH 动态 Cordis 插件集）
+# DSH Plugin Playground
 
-A set of **Dynamic Cordis Plugins** for [DeepSeek Harness (DSH)](https://github.com/Crascit) web GUI.
+> 一个 [DeepSeek Harness (DSH)](https://github.com/Crascit) Web GUI 的**动态 Cordis 插件集**：
+> 在页面各处加实用的小功能 —— 系统监控、用量徽标、一键复制、模板、重命名、收藏、耗时统计。
 
-## 仓库内的插件
-
-| 插件 | 目录 | 作用 |
-|---|---|---|
-| **OpenCode Go Usage Badge** | [`opencode-go-usage-plugin/`](opencode-go-usage-plugin/) | 会话头部的 OpenCode Go 用量徽标 + Rolling/Weekly/Monthly 详情卡 |
-| **System Monitor Badge** | [`system-monitor-plugin/`](system-monitor-plugin/) | 会话头部的宿主 CPU/内存(及 GPU 型号) 实时监控徽标 + 详情卡 |
-| **Copy Format** | [`copy-format-plugin/`](copy-format-plugin/) | 每条 AI 回复图标的 `MD`/`TXT` 复制按钮（复制 Markdown 或纯文本） |
-| **Prompt Templates** | [`prompt-templates-plugin/`](prompt-templates-plugin/) | composer 上方的「模板」按钮 + 常用 prompt 面板，一键写回输入框 |
-| **Session Rename** | [`session-rename-plugin/`](session-rename-plugin/) | 会话头部手动重命名按钮 + 用首条消息快速命名（pin 标题） |
-| **Message Favorites** | [`message-favorites-plugin/`](message-favorites-plugin/) | 每条 AI 回复收藏星标 + 可搜索的收藏面板（侧栏触发 + overlay 浮层） |
-| **Latency Chart** | [`latency-chart-plugin/`](latency-chart-plugin/) | 请求耗时迷你条形图（总耗时 / TTFT 首字切换） |
-
-> 说明：`copy-format-plugin`、`prompt-templates-plugin` 与 `session-rename-plugin` 均为
-> 纯客户端半边（无 `host.js`）；插件是否需要 Host 半边，取决于它能否只用客户端会话
-> 快照/标准 kit/客户端服务就满足需求。
-
-每个插件都是 **host.js（宿主进程采集）+ client.js（页面 UI 注入）** 的双半边结构，
-安装方式见各自目录里的 `INSTALL.md`。
-
-> 📌 想了解每个插件的注入点（slot）、scope、技术要点与维护陷阱，见
-> **[`docs/PLUGINS.md`](docs/PLUGINS.md)**（插件总览 + 注入点对照表）。
-
----
-
-## OpenCode Go Usage Badge
-
-A **Dynamic Cordis Plugin** for [DeepSeek Harness (DSH)](https://github.com/Crascit) web GUI that shows your **OpenCode Go subscription usage** as a compact badge in the **conversation header (top-right status area)**, with a click-to-open detail card.
-
-![Platform: browser](https://img.shields.io/badge/platform-browser-brightgreen)
 ![License: MIT](https://img.shields.io/github/license/UniverseCA/dsh-plugin-playground)
 ![Stars](https://img.shields.io/github/stars/UniverseCA/dsh-plugin-playground?style=social)
 ![Last commit](https://img.shields.io/github/last-commit/UniverseCA/dsh-plugin-playground)
 
-![Screenshot placeholder — add `docs/screenshot.png`](docs/screenshot.png)
+---
 
-> 徽标效果见 `docs/screenshot.md`：顶部右上角的 `Go X%` 徽标 + 点击展开的 Rolling/Weekly/Monthly 详情卡。放一张真实截图到 `docs/screenshot.png` 后这里会自动显示。
+## ✅ 快速了解：这里有什么
 
-## Features
+| 插件 | 目录 | 效果 |
+|---|---|---|
+| **System Monitor** | [`system-monitor-plugin/`](system-monitor-plugin/) | 会话头部实时显示 **CPU / 内存 %**（GPU 型号），点击看详情卡 |
+| **OpenCode Go Usage** | [`opencode-go-usage-plugin/`](opencode-go-usage-plugin/) | 会话头部 **OpenCode Go 套餐用量**徽标 + Rolling/Weekly/Monthly 详情 |
+| **Copy Format** | [`copy-format-plugin/`](copy-format-plugin/) | 每条 AI 回复旁 **MD / TXT** 一键复制（Markdown 或纯文本） |
+| **Prompt Templates** | [`prompt-templates-plugin/`](prompt-templates-plugin/) | 输入框上方 **📋 模板**面板，常用 prompt 一键写回输入框 |
+| **Session Rename** | [`session-rename-plugin/`](session-rename-plugin/) | 会话头部 **✏️ 重命名** +「用首条消息命名」 |
+| **Message Favorites** | [`message-favorites-plugin/`](message-favorites-plugin/) | 收藏 AI 回复 **⭐ + 可搜索收藏面板** |
+| **Latency Chart** | [`latency-chart-plugin/`](latency-chart-plugin/) | 最近请求的**耗时迷你条形图**（总耗时 / TTFT） |
 
-- 🏷️ **Live badge** in the session header showing the **Rolling (5h)** usage percentage, colored by consumption:
-  - 🟢 green < 50%
-  - 🟠 amber ≥ 50%
-  - 🔴 red ≥ 80%
-- 📊 **Detail card** on click showing usage percentage **and reset time** for all three windows:
-  - **Rolling (5h)** · **Weekly** · **Monthly**
-  - e.g. `4 小时后重置（08-15 06:23）` — local-time aware, with `X 分钟后/小时后/天后重置 (MM-DD HH:MM)`
-- ⏱️ Auto-refreshes every **60 seconds**
-- 🔐 Uses your existing DSH credential (`OPENCODE_GO_API_KEY`) — no CLI install needed
+每个插件的完整说明、安装步骤、维护要点都在它自己的目录里（`README.md` + `INSTALL.md`）。
 
-## Data Source
+---
 
-Uses the **official OpenCode usage API**:
+## 🚀 如何安装 / 卸载插件
 
-```
-GET https://opencode.ai/zen/go/v1/usage
-Authorization: Bearer <OPENCODE_GO_API_KEY>
-```
+这些插件是 **DSH「动态 Cordis 插件」**，不是 npm 包。安装 = 在**支持动态插件的 DSH 会话**里告诉 AI 用 `cordis_define` + `cordis_run` 两个工具加载。
 
-```json
-{
-  "usage": {
-    "rolling": { "status": "ok", "percent": 0, "resetsAt": "..." },
-    "weekly":  { "status": "ok", "percent": 0, "resetsAt": "..." },
-    "monthly": { "status": "ok", "percent": 0, "resetsAt": "..." }
-  }
-}
-```
+**两种方式任选一种：**
 
-| Window | Meaning |
-|---|---|
-| `rolling` | Rolling 5-hour window |
-| `weekly` | This week (resets Monday 00:00 UTC) |
-| `monthly` | Current billing month |
+### 方式 A：让 AI 帮你装（推荐，简单）
 
-Errors: `401` = key rejected · `403 EntitlementError` = no Go subscription.
+1. 打开任意一个 **DSH 会话**（就是在界面上和 AI 对话的窗口）。
+2. 把下文整段发给会话里的 AI（`AI` 就是那个会话里的模型）：
 
-> This window/percent representation comes from the official `/v1/usage` endpoint (discovered via [cc-switch#6433](https://github.com/farion1231/cc-switch/issues/6433), corroborated by [robinebers/openusage](https://raw.githubusercontent.com/robinebers/openusage/main/docs/providers/opencode.md) and [andywang425/opencode-go-usage-api](https://raw.githubusercontent.com/andywang425/opencode-go-usage-api/master/README.md)).
+   > 请读取本仓库的 **[`docs/INSTALL-ALL.md`](docs/INSTALL-ALL.md)**，
+   > 并按里面写的 `cordis_define` 参数，用 `cordis_define` / `cordis_run` 逐个加载插件。
 
-## Architecture
+3. 也可以把 `docs/INSTALL-ALL.md` 的内容直接粘贴给 AI。
+4. 每次 `cordis_run` 后，在界面左下角的 **Cordis 面板** 点「允许」授权。
+5. **刷新页面 / 重新进入会话** —— 插件效果就会出现。
 
-DSH dynamic Cordis plugins run in **two halves**:
+### 方式 B：手动指定（想装某一个）
 
-```
-┌────────────── Host (DSH Node process) ──────────────┐
-│  credentials.resolve('OPENCODE_GO_API_KEY')         │
-│         │                                           │
-│  subprocess.run(curl -x PROXY -H "Bearer <key>"     │
-│                  https://opencode.ai/zen/go/v1/usage)│
-│         │                                           │
-│  harness.handle('fetch-usage')  ← client calls this │
-└─────────────────────────────────────────────────────┘
-                    │  Package-private JSON-RPC
-┌────────────── Client (browser page) ────────────────┐
-│  slots.inject('conversation.session.header.utilities') │
-│  → <Go 0%> badge + detail card                       │
-│  ctx.get('timer').interval(load, 60000)  // refresh  │
-└─────────────────────────────────────────────────────┘
-```
+对照下表，把对应目录里的 `host.js` / `client.js` 内容交给 AI 定义：
 
-## File Layout
+| 想装哪个 | idPrefix | 目录里的文件 |
+|---|---|---|
+| System Monitor | `symo` | `host.js` + `client.js` |
+| OpenCode Go Usage | `ocgq` | `host.js` + `client.js` |
+| Copy Format | `cpf` | `client.js`（无 host）|
+| Prompt Templates | `ptpl` | `client.js` |
+| Session Rename | `srn` | `client.js` |
+| Message Favorites | `mfav` | `client.js` |
+| Latency Chart | `ltcy` | `client.js` |
 
-| File | Role |
-|---|---|
-| `opencode-go-usage-plugin/host.js` | Host half — credential + fetch logic |
-| `opencode-go-usage-plugin/client.js` | Client half — badge + detail-card UI |
-| `opencode-go-usage-plugin/INSTALL.md` | Step-by-step install / build guide (中英) |
-| `opencode-go-usage-plugin/README.md` | Implementation notes (中文) |
+对每个插件，对 AI 说一句模板（以 System Monitor 为例）：
 
-## Installing / Running
+> 用 `cordis_define` 定义插件：`plugin.idPrefix` 填 **symo**，`name` 填名称，
+> `code.host` 填仓库里 `system-monitor-plugin/host.js` 的内容，
+> `code.client` 填同目录下 `client.js` 的内容。定义后 `cordis_run` 激活。
 
-This is a **dynamic Cordis plugin**, not an npm package — you load `host.js`
-and `client.js` through DSH's dynamic-plugin mechanism. Follow the full guide
-in **[`opencode-go-usage-plugin/INSTALL.md`](opencode-go-usage-plugin/INSTALL.md)**.
+**卸载**：在 Cordis 面板里对对应插件点「停止」或「移除」。
 
-Quick summary: make sure `OPENCODE_GO_API_KEY` is configured → `cordis_define`
-with `code.host`/`code.client` from those files → `cordis_run` → authorize →
-refresh & open a session → the badge appears top-right of the header.
+---
 
-## Configuration
+## 📋 常见问题
 
-- **API key**: provided automatically via DSH `credentials.resolve('OPENCODE_GO_API_KEY')`.
-- **Proxy**: the fetch runs `curl -x http://127.0.0.1:7897` in this build (the source endpoint is behind Cloudflare and needs a browser User-Agent + a reachable route). If your network doesn't need a proxy, remove the `-x` flag in `host.js`.
-- **Refresh interval**: change `60000` (ms) in `client.js`.
+**Q：装完没看到效果？**
+客户端插件只渲染在**加载它的那个宿主页面**。装完后**刷新页面 / 重开一个会话**再找：
+- System Monitor / OpenCode Go / Latency → 会话头部右上角
+- Copy Format / 收藏星标 → 每条 AI 回复的图标栏
+- Prompt Templates → 输入框上方
+- Session Rename → 会话头部
+- Message Favorites 触发按钮 → 左侧栏底部
 
-## Why not the Zen balance?
+**Q：需要什么前置环境？**
+- 能运行动态 Cordis 插件的 **DSH Web 会话**。
+- **System Monitor** 需要 DSH 宿主进程所在机器（Windows）能调用 `powershell.exe`。
+- **OpenCode Go Usage** 需要 DSH 已配置 `OPENCODE_GO_API_KEY` 凭据（一般你的 opencode-go 模型已经在用），以及能访问 `https://opencode.ai`（代码默认走本地代理 `127.0.0.1:7897`）。
 
-OpenCode has **two products** that are easy to confuse:
+**Q：会不会有安全风险？**
+纯客户端插件只在你浏览器里工作；会写 Host 的插件（System Monitor、OpenCode Go）只调用本机 `powershell`/`curl` 读取系统信息或用量，**不修改任何数据**。凭据不会被打包进源码（见 `.gitignore`）。
 
-- **OpenCode Go** (subscription) → official `/v1/usage` returns usage **percentages** per window. This plugin targets **this**.
-- **OpenCode Zen** (pay-as-you-go balance) → has **no official balance JSON endpoint**; it uses the `_server` billing server-function with a login **cookie** (`balance / 1e8` = USD). Not included here.
+---
 
-## License
+## 🛠 开发者 / 维护者
+
+想了解插件怎么写的、每个插件的注入点（slot）、scope、技术要点，见
+[**`docs/PLUGINS.md`**](docs/PLUGINS.md)（插件总览 + 注入点对照表 + 踩坑清单）。
+
+仓库自带 CI（[`.github/workflows/ci.yml`](.github/workflows/ci.yml)）：push 时对每个
+插件的 `host.js` / `client.js` 做 `node --check` 语法检查 + 密钥扫描守护。
+
+## 📄 许可证
 
 [MIT](LICENSE)
 
 ---
 
-Originally built for the DeepSeek Harness web GUI. Improvements & PRs welcome.
+Built for the DeepSeek Harness web GUI. Improvements & PRs welcome.
