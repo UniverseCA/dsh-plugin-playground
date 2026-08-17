@@ -4,3 +4,9 @@
 node_modules/
 *.log
 .DS_Store
+
+# 工作区 RAG 本地产物（用户运行 helper 时生成）
+.rag/
+tools/.model-cache/
+tools/py/
+.npm-cache/

@@ -1,0 +1,8 @@
+[
+  {"query": "手冲咖啡的粉水比和水温是多少", "expected": ["手冲咖啡"]},
+  {"query": "量子比特的叠加态与纠缠是什么", "expected": ["量子计算"]},
+  {"query": "SQL 如何把两张表按用户关联起来", "expected": ["sql_cheatsheet"]},
+  {"query": "咖啡萃取过苦或过酸的原因", "expected": ["手冲咖啡"]},
+  {"query": "Shor 算法对 RSA 加密的威胁", "expected": ["量子计算"]},
+  {"query": "如何用索引加速数据库查询", "expected": ["sql_cheatsheet"]}
+]

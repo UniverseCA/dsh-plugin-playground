@@ -1,0 +1,2 @@
+name: RAG 工作区检索
+description: 具备 cordis 预设全部能力，并内置工作区 RAG 本地语义检索（rag_ingest / rag_search / rag_status / rag_eval），用于在本地文件夹上做中文医学指南等文档的混合检索。

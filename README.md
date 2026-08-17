@@ -20,6 +20,12 @@
 | **Session Rename** | [`session-rename-plugin/`](session-rename-plugin/) | 会话头部 **✏️ 重命名** +「用首条消息命名」 |
 | **Message Favorites** | [`message-favorites-plugin/`](message-favorites-plugin/) | 收藏 AI 回复 **⭐ + 可搜索收藏面板** |
 | **Latency Chart** | [`latency-chart-plugin/`](latency-chart-plugin/) | 最近请求的**耗时迷你条形图**（总耗时 / TTFT） |
+| **Workspace RAG** | [`workspace-rag-plugin/`](workspace-rag-plugin/) | 工作区本地**中文混合检索**（词级 BM25 + 语义向量）：4 个模型工具 + PDF/DOCX 解析 |
+
+> **Workspace RAG 与其它插件不同**：它是宿主**工具型**静态插件（不注入页面 UI，而是给会话
+> 注册 `rag_ingest` 等模型工具），装载方式是 **agent preset / DSH Loader 包**而非动态
+> `cordis_define`，详见其目录内 [`README.md`](workspace-rag-plugin/README.md) 与
+> [`INSTALL.md`](workspace-rag-plugin/INSTALL.md)。
 
 每个插件的完整说明、安装步骤、维护要点都在它自己的目录里（`README.md` + `INSTALL.md`）。
 

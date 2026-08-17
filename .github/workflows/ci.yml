@@ -28,7 +28,10 @@ jobs:
             prompt-templates-plugin/client.js \
             session-rename-plugin/client.js \
             message-favorites-plugin/client.js \
-            latency-chart-plugin/client.js; do
+            latency-chart-plugin/client.js \
+            workspace-rag-plugin/rag-plugin.cjs \
+            workspace-rag-plugin/tools/rag-helper.js \
+            loader-packages/workspace-rag/lib/index.js; do
             echo "checking $f"
             node --check "$f"
           done

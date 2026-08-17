@@ -1,0 +1,15 @@
+{
+  "name": "dsh-plugin-workspace-rag",
+  "version": "0.1.0",
+  "private": true,
+  "description": "DSH Loader host 插件：工作区本地 RAG（rag_ingest/rag_search/rag_status/rag_eval），词级 BM25 + 本地语义向量混合检索，支持 PDF/DOCX。",
+  "license": "MIT",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": {
+      "default": "./lib/index.js"
+    },
+    "./package.json": "./package.json"
+  }
+}

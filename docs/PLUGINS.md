@@ -151,10 +151,31 @@
 - 每请求 `n.usage?.outputTokens` 显示输出 token。
 - 手写 div 条形图（无额外图表库）；`RECENT` 常量控制条数。
 
+### 7. Workspace RAG — `workspace-rag-plugin/`
+
+| 项 | 值 |
+|---|---|
+| 半边 | **仅 host（工具型静态插件）** |
+| 注入点 | 无（不注入 UI；注册模型工具 `rag_ingest` / `rag_search` / `rag_status` / `rag_eval`）|
+| 用途 | 工作区本地中文混合检索：词级 BM25 + bge 语义向量，PDF/DOCX 解析 |
+| 装载 | **agent preset / DSH Loader 包**（非动态 `cordis_define`）|
+| 提交 | 本次提交 |
+
+- **host**：静态 CJS 插件，`ctx.tools.register` 手工构造 ToolDefinition（零 npm 依赖）；
+  经 `subprocess` 起工作区 `tools/rag-helper.js` daemon（extract / segment / embed 三条命令）。
+- **检索**：结构化切块（markdown 标题 / 编号小节 `4.3` 为边界）+ 标题词 BM25 加权 +
+  文档级聚合（`group_by_doc`）；`hybrid_weight` 控制语义占比（默认 0.6）。
+- **分词**：segmentit 词级切分 + 中文虚词停用表；embedding 用 `Xenova/bge-small-zh-v1.5`
+  （512 维，查询自动加指令前缀），首次下载走 `hf_endpoint` / `hf_proxy`。
+- **开关**：工作区 `.rag/off` 空文件 = 该工作区禁用；`.rag/eval.json` = 回归评估集
+  （`rag_eval` 输出 hit@1/3/5）。
+- **维护**：插件本体 `rag-plugin.cjs` 与 `loader-packages/workspace-rag`（ESM 转发壳）
+  是同一份代码；`preset/` 为可直接复制的 agent preset（基于 cordis 复制并移除
+  `tool-cordis` 行，避免宿主级检查提供者冲突）。
+
 ---
 
 ## 通用维护清单
-
 - **新增一半边**：按需给 `inject` 数组加服务（`slots` 必加；host 常用 `subprocess`/
   `credentials`；client 加 `sessions` 等才可访问对应 `ctx.xxx`）。对象形式插件才能声明
   `inject`。
